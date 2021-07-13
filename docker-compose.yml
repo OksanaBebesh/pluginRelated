@@ -1,0 +1,31 @@
+version: '3.1'
+
+services:
+
+  wpplagin:
+    image: wordpress
+    ports:
+      - 80:80
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_USER: pluginRelated
+      WORDPRESS_DB_PASSWORD: pluginRelated
+      WORDPRESS_DB_NAME: pluginRelated
+    volumes:
+      - ./src/:/var/www/html
+      - ./share-files/logs/apache:/var/log/
+    extra_hosts: 
+      - "wordpress.loc:127.0.0.1"
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - 12345:3306
+    environment:
+      MYSQL_DATABASE: pluginRelated
+      MYSQL_USER: pluginRelated
+      MYSQL_PASSWORD: pluginRelated
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - ./db/:/var/lib/mysql
+
