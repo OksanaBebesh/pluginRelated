@@ -1,0 +1,34 @@
+.relatedposts {
+    width: 640px;
+    margin: 0 0 20px 0;
+    float: left;
+    font-size: 12px;
+}
+
+.relatedposts h3 {
+    font-size: 20px;
+    margin: 0 0 5px 0;
+}
+
+.relatedthumb {
+    margin: 0 1px 0 1px;
+    float: left;
+}
+
+.relatedthumb img {
+    margin: 0 0 3px 0;
+    padding: 0;
+}
+
+.relatedthumb a {
+    color: #333;
+    text-decoration: none;
+    display: block;
+    padding: 4px;
+    width: 150px;
+}
+
+.relatedthumb a:hover {
+    background-color: #ddd;
+    color: #000;
+}
