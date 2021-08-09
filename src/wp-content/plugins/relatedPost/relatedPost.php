@@ -7,48 +7,52 @@ Author: Имя автора
 */
 require_once (__DIR__.'/functions.php');
 
-add_action( 'wp_ajax_test_action', 'my_action_callback' );
-add_action( 'wp_ajax_nopriv_test_action', 'my_action_callback' );
+add_action( 'wp_ajax_get_related_post', 'my_action_callback' );
+add_action( 'wp_ajax_nopriv_get_related_post', 'my_action_callback' );
 function my_action_callback(){
-    $whatever = $_POST['whatever'];
-    $whatever += 10;
-    echo 1111;
+    $category_post = $_POST['category_post'];
+    echo "$category_post: = ";
+    echo $category_post;
     wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
 }
 
-wp_enqueue_script('jquery');
+
 add_action( 'wp_enqueue_scripts', 'myajax_data', 99 );
 function myajax_data(){
+    wp_enqueue_script('jquery');
+    wp_enqueue_script('relatedpost','/wp-content/plugins/relatedPost/js/script.js');
+    global $post;
+    $postСategories = wp_get_post_categories($post->ID);
 
+    $taxonomies = wp_get_object_terms( $post->ID, 'category', ['fields' => 'All'] );
+    $queryWithPost = new WP_Query([
+        'category__in' => $postСategories,
+        'post_status' => "publish",
+        'posts_per_page' => 6,
+    ]);
+    $result = [];
+   foreach($queryWithPost as $postInfo){
+       if ($postInfo->post_title !=null){
+
+           $result [] = [
+               'post-title' => $postInfo->post_title,
+               'post-content' => $postInfo->post_content
+           ];
+
+       }
+
+    }
     //todo check !!!
-    wp_localize_script( 'relatedpost', 'ajaxurl123',
+    wp_localize_script( 'relatedpost', 'myajaxData',
         array(
-            'url' => admin_url('admin-ajax.php')
+            'url' => admin_url('admin-ajax.php'),
+            'category_post_boby' => $queryWithPost,
+            'category_post' => $postСategories,
+            'taxonomies' => $taxonomies,
+            'result' => $result,
         )
     );
 }
 
-add_action( 'wp_footer', 'my_action_javascript', 99 );
-function my_action_javascript() {
-    ?>
-    <script type='text/javascript'>
-        /* <![CDATA[ */
-        var myajax = {"url":"http://wordpress.loc/wp-admin/admin-ajax.php"};
-        /* ]]> */
-    </script>
-    <script>
-        jQuery(document).ready( function( $ ){
-            // console.log(ajaxurl123)
-            var data = {
-                action: 'test_action',
-                whatever: 1234
-            };
-            // с версии 2.8 'ajaxurl' всегда определен в админке
-            jQuery.post( myajax.url , data, function( response ){
 
-                alert( 'Получено с сервера: ' + response );
-            } );
-        } );
-    </script>
-    <?php
-}
+
