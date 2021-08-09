@@ -1,27 +1,18 @@
 
-
-$(document).ready( function( $ ){
-    console.log('yes')
+jQuery(document).ready(function ($) {
+    const urlPost = new URL(location.href);
+    var slug = urlPost.pathname;
+    slug = slug.replaceAll('/', '');
     var data = {
         action: 'my_action',
-        whatever: 1234
+        postCategory: myajax.postCategory,
+        postTerms: myajax.postTerms
     };
-
     // с версии 2.8 'ajaxurl' всегда определен в админке
-    $.post( ajaxurl, data, function( response ){
-        alert( 'Получено с сервера: ' + response );
-    } );
-} )
+    jQuery.post(myajax.url, data, function (response) {
+        console.log('response:');
+        console.log(response);
+    });
 
 
-let body  = new FormData();
-body.append('action','myaction');
-
-
-
-('/wp-admin/admin-ajax.php',{
-    method:'POST',
-    body
-}).then(result => {
-    console.log(result.text());
-})
+});

@@ -5,50 +5,54 @@ Description: Плагин получения актуальных постов
 Version: 1.0
 Author: Имя автора
 */
-require_once (__DIR__.'/functions.php');
 
-add_action( 'wp_ajax_test_action', 'my_action_callback' );
-add_action( 'wp_ajax_nopriv_test_action', 'my_action_callback' );
-function my_action_callback(){
-    $whatever = $_POST['whatever'];
-    $whatever += 10;
-    echo 1111;
-    wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+if( wp_doing_ajax() ) {
+    add_action('wp_ajax_my_action', 'my_action_callback');
+    add_action('wp_ajax_nopriv_my_action', 'my_action_callback');
 }
 
-wp_enqueue_script('jquery');
+add_action('wp_enqueue_scripts', 'include_custom_jquery');
+function include_custom_jquery(){
+    wp_enqueue_script('jquery');
+}
+
+require_once (__DIR__.'/functions.php');
+function my_action_callback(){
+
+    $category = $_POST['postSlug'];
+
+    $termIds = [];
+    foreach ($category as $value) {
+        $termIds[] = $value['term_id'];
+    }
+
+    $arg = array(
+        'post_type' => 'post',
+    );
+
+    $query = new WP_Query(array($arg));
+    echo json_encode($query->get_posts());
+
+    wp_die();
+}
+
+//todo add js file /js/script.js  "handler" = "relatedpost"
+
 add_action( 'wp_enqueue_scripts', 'myajax_data', 99 );
 function myajax_data(){
+    global $post;
 
-    //todo check !!!
-    wp_localize_script( 'relatedpost', 'ajaxurl123',
-        array(
+    $categorayIds = wp_get_post_categories($post->ID);
+    $termIds = wp_get_post_terms($post->ID);
+
+    wp_enqueue_script('relatedpost', '/wp-content/plugins/relatedPost/js/script.js');
+    wp_localize_script( 'relatedpost', 'myajax',
+        [
+            'post' => $post,
+            'postCategory' => $categorayIds,
+            'postTerms' => $termIds,
             'url' => admin_url('admin-ajax.php')
-        )
+        ]
     );
-}
 
-add_action( 'wp_footer', 'my_action_javascript', 99 );
-function my_action_javascript() {
-    ?>
-    <script type='text/javascript'>
-        /* <![CDATA[ */
-        var myajax = {"url":"http://wordpress.loc/wp-admin/admin-ajax.php"};
-        /* ]]> */
-    </script>
-    <script>
-        jQuery(document).ready( function( $ ){
-            // console.log(ajaxurl123)
-            var data = {
-                action: 'test_action',
-                whatever: 1234
-            };
-            // с версии 2.8 'ajaxurl' всегда определен в админке
-            jQuery.post( myajax.url , data, function( response ){
-
-                alert( 'Получено с сервера: ' + response );
-            } );
-        } );
-    </script>
-    <?php
 }
