@@ -22,7 +22,41 @@ function my_action_callback(){
             'post_status' => 'publish',
             'page' => 'post'
         ]);
-    echo json_encode($queryRelatedPost->get_posts());
+
+echo json_encode($queryRelatedPost->get_posts());
+
+
+//    $queryRelatedPost =
+//        get_posts([
+//            'category__in' => $category_post,
+//            'post_status' => 'publish',
+//            'page' => 'post'
+//        ]);
+//$strResult = '';
+//foreach($queryRelatedPost as $post) {
+//
+//$strResult .=
+//    '<article id="post-13" class="post-13 post type-post status-publish format-standard hentry category-dress entry">
+//	<header class="entry-header alignwide">
+//		<h1 class="entry-title">'.$post.'</h1>
+//	</header>
+//	<div class="entry-content">
+//        <p>'.$post.'</p>
+//	</div>
+//	<footer class="entry-footer default-max-width">
+//		<div class="posted-by">
+//		<span class="posted-on">Published
+//		    <time class="entry-date published updated" datetime="2021-08-08T20:06:54+00:00">August 8, 2021</time>
+//		</span>
+//		<span class="byline">By <a href="http://wordpress.loc/author/pluginrelated/" rel="author">pluginRelated</a></span></div>
+//		<div class="post-taxonomies">
+//		<span class="cat-links">Categorized as <a href="http://wordpress.loc/category/dress/" rel="category tag">dress</a> </span></div>
+//	</footer>
+//    </article>';
+//
+//}
+//echo $strResult ;
+//    wp_reset_postdata();
     wp_die();
 }
 
