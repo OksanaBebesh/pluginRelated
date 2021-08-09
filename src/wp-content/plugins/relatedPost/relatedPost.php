@@ -11,9 +11,19 @@ add_action( 'wp_ajax_get_related_post', 'my_action_callback' );
 add_action( 'wp_ajax_nopriv_get_related_post', 'my_action_callback' );
 function my_action_callback(){
     $category_post = $_POST['category_post'];
-    echo "$category_post: = ";
-    echo $category_post;
-    wp_die(); // выход нужен для того, чтобы в ответе не было ничего лишнего, только то что возвращает функция
+    $termIds = [];
+    foreach ($category_post as $value) {
+        $termIds[] = $value['term_id'];
+    }
+
+    $queryRelatedPost =
+        new WP_Query([
+            'category__in' => $category_post,
+            'post_status' => 'publish',
+            'page' => 'post'
+        ]);
+    echo json_encode($queryRelatedPost->get_posts());
+    wp_die();
 }
 
 
@@ -22,37 +32,15 @@ function myajax_data(){
     wp_enqueue_script('jquery');
     wp_enqueue_script('relatedpost','/wp-content/plugins/relatedPost/js/script.js');
     global $post;
-    $postСategories = wp_get_post_categories($post->ID);
+    $PostCategories = wp_get_post_categories($post->ID);
+    //TODO  wp_get_object_terms - function - the best of wp_get_post_categories()
+    //$taxonomies = wp_get_object_terms( $post->ID, 'category', ['fields' => 'All'] );
 
-    $taxonomies = wp_get_object_terms( $post->ID, 'category', ['fields' => 'All'] );
-    $queryWithPost = new WP_Query([
-        'category__in' => $postСategories,
-        'post_status' => "publish",
-        'posts_per_page' => 6,
-    ]);
-    $result = [];
-   foreach($queryWithPost as $postInfo){
-       if ($postInfo->post_title !=null){
-
-           $result [] = [
-               'post-title' => $postInfo->post_title,
-               'post-content' => $postInfo->post_content
-           ];
-
-       }
-
-    }
-    //todo check !!!
+    //TODO check !!!
     wp_localize_script( 'relatedpost', 'myajaxData',
         array(
             'url' => admin_url('admin-ajax.php'),
-            'category_post_boby' => $queryWithPost,
-            'category_post' => $postСategories,
-            'taxonomies' => $taxonomies,
-            'result' => $result,
+            'category_post' => $PostCategories,
         )
     );
 }
-
-
-

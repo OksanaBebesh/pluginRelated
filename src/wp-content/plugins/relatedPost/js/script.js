@@ -1,5 +1,3 @@
-
-
 jQuery(document).ready( function( $ ) {
     console.log(myajaxData)
         var data = {
@@ -11,9 +9,3 @@ jQuery(document).ready( function( $ ) {
             alert('Получено с сервера: ' + response);
         });
     });
-
-
-
-
-
-
