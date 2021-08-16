@@ -1,36 +1,21 @@
+    jQuery(document).ready( function( $ ) {
+            let data = {
+                action: 'get_related_post',
+                category_post: ajaxDataSend.category_post
+            };
 
-jQuery(document).ready( function( $ ) {
-    console.log(myajaxData)
-        var data = {
-            action: 'get_related_post',
-            category_post: myajaxData.category_post
-        };
+            let locationHref = location.href;
+            let locationHost  = location.protocol + '//' + location.host;
+            let strForCut = locationHref.substr(locationHost.length);
 
-        jQuery.post(myajaxData.url, data, function (response) {
-            const obj = JSON.parse(response);
-            console.log(obj);
-            drawRelatedPosts(obj);
-        });
+            if (strForCut != '/' ){
+                jQuery.post(ajaxDataSend.url, data, function (response) {
+                    drawRelatedPosts(response);
+                });
+            }
     });
 
-function drawRelatedPosts(jsonInfo){
-    //version 1
-    // let divMain = document.getElementById("primary");
-    // let responseDiv = document.createElement("div");
-    // document.getElementById("block-2").textContent = JSON.parse(jsonInfo);
-
-
-
-    //version 2
-    let divMain = document.getElementById("primary");
-    jsonInfo.forEach(function(value){
-        let responseDiv = document.createElement("div");
-        responseDiv.innerHTML = "<hr>";
-        responseDiv.innerHTML = responseDiv.innerHTML + "<div><H2>" + value['post_title'] + "</H2></div>";
-        responseDiv.innerHTML = responseDiv.innerHTML + "<div>" + value['post_content'] + "</div>";
-        responseDiv.innerHTML = responseDiv.innerHTML + "<div>" + value['post_date'] + "</div>";
-        responseDiv.innerHTML = responseDiv.innerHTML + "<hr>";
-        divMain.appendChild(responseDiv);
-    })
-
-}
+    function drawRelatedPosts(relatedPostsHTML){
+            let divForRelatedPosts = document.getElementById("site-footer");
+            divForRelatedPosts.insertAdjacentHTML('beforebegin',JSON.parse(relatedPostsHTML));
+    }
